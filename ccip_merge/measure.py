@@ -4,7 +4,6 @@ import numpy as np
 import pandas as pd
 from ditk import logging
 from imgutils.metrics import ccip_batch_differences, ccip_default_threshold
-from scipy.optimize import minimize
 from tqdm import tqdm
 
 from .index import get_np_feats
@@ -35,24 +34,10 @@ def measure_tag_via_func(tag, func):
 
 
 def ccip_merge_func(embs):
-    # TODO: just replace your function here!!!
-    def objective_function(x):
-        total_similarity = 0
-        for vector in embs:
-            total_similarity += np.dot(x, vector) / (np.linalg.norm(x) * np.linalg.norm(vector))
-        return -total_similarity / embs.shape[0]
-
-    initial_guess = np.random.rand(768)
-    constraints = ({'type': 'eq', 'fun': lambda x: np.linalg.norm(x) - 1.0})
-    result = minimize(
-        objective_function, initial_guess,
-        constraints=constraints,
-    )
-
-    mean_length = np.linalg.norm(embs, axis=1).mean()
-    best_vec = result.x
-    best_vec = best_vec * mean_length
-    return best_vec
+    lengths = np.linalg.norm(embs, axis=-1)
+    embs = embs / lengths.reshape(-1, 1)
+    ret_embedding = embs.mean(axis=0)
+    return ret_embedding / np.linalg.norm(ret_embedding) * lengths.mean()
 
 
 def get_metrics_of_tags(n: int = 100) -> pd.DataFrame:
