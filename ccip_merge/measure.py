@@ -36,7 +36,8 @@ def measure_tag_via_func(tag, func):
 def ccip_merge_func(embs):
     lengths = np.linalg.norm(embs, axis=-1)
     embs = embs / lengths.reshape(-1, 1)
-    return embs.mean(axis=0) * lengths.mean()
+    ret_embedding = embs.mean(axis=0)
+    return ret_embedding / np.linalg.norm(ret_embedding) * lengths.mean()
 
 
 def get_metrics_of_tags(n: int = 100) -> pd.DataFrame:
