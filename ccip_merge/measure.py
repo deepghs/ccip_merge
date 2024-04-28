@@ -42,7 +42,7 @@ def ccip_merge_func(embs):
             total_similarity += np.dot(x, vector) / (np.linalg.norm(x) * np.linalg.norm(vector))
         return -total_similarity / embs.shape[0]
 
-    initial_guess = np.random.rand(768)
+    initial_guess = embs.mean(axis=0)
     constraints = ({'type': 'eq', 'fun': lambda x: np.linalg.norm(x) - 1.0})
     result = minimize(
         objective_function, initial_guess,
