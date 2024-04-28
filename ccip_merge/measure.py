@@ -1,5 +1,6 @@
 import time
 
+import numpy as np
 import pandas as pd
 from ditk import logging
 from imgutils.metrics import ccip_batch_differences, ccip_default_threshold
@@ -33,7 +34,9 @@ def measure_tag_via_func(tag, func):
 
 
 def ccip_merge_func(embs):
-    return embs.mean(axis=0)
+    lengths = np.linalg.norm(embs, axis=-1)
+    embs = embs / lengths.reshape(-1, 1)
+    return embs.mean(axis=0) * lengths.mean()
 
 
 def get_metrics_of_tags(n: int = 100) -> pd.DataFrame:
