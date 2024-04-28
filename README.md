@@ -10,6 +10,23 @@ cd ccip_merge
 pip install -r requirements.txt
 ```
 
+## Best Solution
+
+**New update in 2024.4.28: Solved, the best solution is just aligning the norm of embeddings, and get their center
+point.** Like this
+
+```python
+import numpy as np
+
+
+def ccip_merge_func(embs):
+    lengths = np.linalg.norm(embs, axis=-1)
+    embs = embs / lengths.reshape(-1, 1)
+    ret_embedding = embs.mean(axis=0)
+    return ret_embedding / np.linalg.norm(ret_embedding) * lengths.mean()
+
+```
+
 ## Run Experiment
 
 **Target: FIND OUT AN EMBEDDING CLOSEST TO THE GIVEN EMBEDDINGS**
